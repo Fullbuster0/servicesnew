@@ -41,3 +41,4 @@ bridge_state.json.tmp
 Thumbs.db
 .vercel
 .docusaurus/
+.env*
