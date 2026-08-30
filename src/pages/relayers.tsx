@@ -29,19 +29,18 @@ function RelayerHero() {
             backed by its own relayer wallet — verifiable on-chain. If you
             want to support our work, please delegate with us!
           </p>
-          <div className={hero.statsRow}>
-            <div className={hero.statGlass} data-hue="blue">
-              <span className={hero.statLabel}>Relayer Hubs</span>
-              <span className={hero.statNumber}>{relayerHubs.length}</span>
-            </div>
-            <div className={hero.statGlass} data-hue="violet">
-              <span className={hero.statLabel}>Active Routes</span>
-              <span className={hero.statNumber}>{totalRoutes}</span>
-            </div>
-            <div className={hero.statGlass} data-hue="emerald">
-              <span className={hero.statLabel}>Chains Connected</span>
-              <span className={hero.statNumber}>{uniqueChainCount}</span>
-            </div>
+          <div className={hero.statStrip}>
+            <span className={hero.statItem}>
+              <strong>{relayerHubs.length}</strong> Relayer hubs
+            </span>
+            <span className={hero.statDivider} aria-hidden="true" />
+            <span className={hero.statItem}>
+              <strong>{totalRoutes}</strong> Active routes
+            </span>
+            <span className={hero.statDivider} aria-hidden="true" />
+            <span className={hero.statItem}>
+              <strong>{uniqueChainCount}</strong> Chains connected
+            </span>
           </div>
         </div>
       </div>

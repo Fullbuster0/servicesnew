@@ -155,7 +155,7 @@
 
 .heroGhost {
   color: var(--sz-ink);
-  /* No backdrop-filter: transforms on hover (see .statGlass note). */
+  /* No backdrop-filter: transforms on hover flicker (documented regression). */
   background: var(--sz-glass-strong);
   border: 1px solid var(--sz-border-strong);
 }
@@ -167,83 +167,35 @@
   text-decoration: none;
 }
 
-/* ============================== STAT GLASS ============================== */
-.statsRow {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.85rem;
-  width: 100%;
-  max-width: 720px;
+/* ============================== STAT STRIP ============================== */
+.statStrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.1rem;
   margin-top: 2.4rem;
 }
 
-.statGlass {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 1.15rem 1.15rem 1.05rem;
-  border: 1px solid var(--sz-border);
-  border-radius: var(--sz-r-lg);
-  /* NO backdrop-filter here: this card transforms on hover, and blur+transform
-     on the same layer re-composites and flickers (documented regression). The
-     glass read comes from the near-opaque token instead. */
-  background: var(--sz-glass-strong);
-  box-shadow: var(--sz-sh-1);
-  overflow: hidden;
-  text-align: left;
-  transition: transform 240ms var(--sz-ease), box-shadow 240ms var(--sz-ease),
-    border-color 240ms var(--sz-ease);
+.statItem {
+  font-size: 0.95rem;
+  color: var(--sz-ink-muted);
+  letter-spacing: 0.01em;
 }
 
-.statGlass::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: var(--sz-grad-brand);
-  opacity: 0.55;
-  transition: opacity 320ms var(--sz-ease);
-}
-
-.statGlass:hover {
-  transform: translateY(-3px);
-  border-color: var(--sz-border-strong);
-  box-shadow: var(--sz-sh-3);
-}
-
-.statGlass:hover::before {
-  opacity: 1;
-}
-
-.statGlass[data-hue="violet"]::before {
-  background: linear-gradient(90deg, var(--sz-violet), var(--sz-blue));
-}
-
-.statGlass[data-hue="emerald"]::before {
-  background: linear-gradient(90deg, var(--sz-emerald), var(--sz-cyan));
-}
-
-.statGlass[data-hue="slate"]::before {
-  background: linear-gradient(90deg, var(--sz-slate), rgba(100, 116, 139, 0.4));
-}
-
-.statLabel {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--sz-ink-faint);
-}
-
-.statNumber {
+.statItem strong {
   font-family: var(--ifm-font-family-monospace);
-  font-size: clamp(1.75rem, 3.4vw, 2.35rem);
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 1;
+  letter-spacing: -0.03em;
   color: var(--sz-ink);
   font-variant-numeric: tabular-nums;
+  margin-right: 0.3rem;
+}
+
+.statDivider {
+  width: 1px;
+  height: 1.15rem;
+  background: var(--sz-border-strong);
 }
 
 /* ============================== SECTIONS ============================== */
@@ -568,8 +520,8 @@
   .heroBanner {
     padding: 4rem 0 3.25rem;
   }
-  .statsRow {
-    gap: 0.7rem;
+  .statStrip {
+    gap: 0.85rem;
   }
   .sectionHead {
     align-items: flex-start;
@@ -590,16 +542,9 @@
   .heroTagline {
     font-size: 1rem;
   }
-  .statsRow {
-    grid-template-columns: 1fr;
-    max-width: 100%;
+  .statStrip {
+    gap: 0.75rem 1rem;
     margin-top: 2.15rem;
-  }
-  .statGlass {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.95rem 1.05rem;
   }
   .mainSection {
     padding: 3rem 0 2.25rem;

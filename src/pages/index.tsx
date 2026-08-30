@@ -60,19 +60,18 @@ function HomepageHeader() {
             </a>
           </div>
 
-          <div className={styles.statsRow}>
-            <div className={styles.statGlass} data-hue="blue">
-              <span className={styles.statLabel}>Mainnet Chains</span>
-              <span className={styles.statNumber}>{mainnetItems.length}</span>
-            </div>
-            <div className={styles.statGlass} data-hue="violet">
-              <span className={styles.statLabel}>Testnet Chains</span>
-              <span className={styles.statNumber}>{testnetItems.length}</span>
-            </div>
-            <div className={styles.statGlass} data-hue="slate">
-              <span className={styles.statLabel}>Archive</span>
-              <span className={styles.statNumber}>{archiveItems.length}</span>
-            </div>
+          <div className={styles.statStrip}>
+            <span className={styles.statItem}>
+              <strong>{mainnetItems.length}</strong> Mainnets
+            </span>
+            <span className={styles.statDivider} aria-hidden="true" />
+            <span className={styles.statItem}>
+              <strong>{testnetItems.length}</strong> Testnets
+            </span>
+            <span className={styles.statDivider} aria-hidden="true" />
+            <span className={styles.statItem}>
+              <strong>{archiveItems.length}</strong> Archive
+            </span>
           </div>
         </div>
       </div>
