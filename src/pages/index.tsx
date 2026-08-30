@@ -59,20 +59,6 @@ function HomepageHeader() {
               Open explorer ↗
             </a>
           </div>
-
-          <div className={styles.statStrip}>
-            <span className={styles.statItem}>
-              <strong>{mainnetItems.length}</strong> Mainnets
-            </span>
-            <span className={styles.statDivider} aria-hidden="true" />
-            <span className={styles.statItem}>
-              <strong>{testnetItems.length}</strong> Testnets
-            </span>
-            <span className={styles.statDivider} aria-hidden="true" />
-            <span className={styles.statItem}>
-              <strong>{archiveItems.length}</strong> Archive
-            </span>
-          </div>
         </div>
       </div>
     </div>

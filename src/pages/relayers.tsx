@@ -7,7 +7,6 @@ import RelayerCard from "../components/RelayerCard/RelayerCard";
 import {
   relayerHubs,
   totalRoutes,
-  uniqueChainCount,
 } from "../components/RelayerCard/relayerData";
 import "@site/src/css/custom.css";
 
@@ -29,19 +28,6 @@ function RelayerHero() {
             backed by its own relayer wallet — verifiable on-chain. If you
             want to support our work, please delegate with us!
           </p>
-          <div className={hero.statStrip}>
-            <span className={hero.statItem}>
-              <strong>{relayerHubs.length}</strong> Relayer hubs
-            </span>
-            <span className={hero.statDivider} aria-hidden="true" />
-            <span className={hero.statItem}>
-              <strong>{totalRoutes}</strong> Active routes
-            </span>
-            <span className={hero.statDivider} aria-hidden="true" />
-            <span className={hero.statItem}>
-              <strong>{uniqueChainCount}</strong> Chains connected
-            </span>
-          </div>
         </div>
       </div>
     </div>
