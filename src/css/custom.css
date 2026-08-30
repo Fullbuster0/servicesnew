@@ -25,6 +25,12 @@
   --ifm-color-primary-lighter: #6f92f3;
   --ifm-color-primary-lightest: #a8c0f9;
 
+  /* Accent used wherever the brand blue is drawn on its own translucent tint
+   * (sidebar active row, navbar active pill). #2f5fe0 measures 4.43:1 there,
+   * under the 4.5:1 floor; this darker step measures 5.05:1 and reads as the
+   * same blue. */
+  --sz-accent-strong: #2b56cf;
+
   --ifm-font-family-base: "Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --ifm-heading-font-family: "Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --ifm-font-family-monospace: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
@@ -134,6 +140,10 @@
   --ifm-color-primary-lighter: #b6cbff;
   --ifm-color-primary-lightest: #d5e1ff;
   --docusaurus-highlighted-code-line-bg: rgba(138, 169, 255, 0.12);
+
+  /* Dark theme already clears the threshold on its own tint (measured 7.42:1),
+   * so the accent stays at the primary value. */
+  --sz-accent-strong: #8aa9ff;
 
   --sz-bg: #06070c;
   --sz-surface: #0e1119;
@@ -310,18 +320,51 @@ main,
 }
 
 /* ============================== NAVBAR ============================== */
+/* The frosted-glass effect is painted by .navbar::before, NOT by .navbar.
+ *
+ * Why: Docusaurus renders .navbar-sidebar (the mobile drawer) and
+ * .navbar-sidebar__backdrop as CHILDREN of .navbar. Both are position: fixed
+ * with top/bottom: 0. A backdrop-filter on .navbar makes it a containing block
+ * for fixed-position descendants, so the drawer resolved its height against
+ * the 58px navbar instead of the viewport: measured 57px tall with its items
+ * row at 0px, i.e. an empty drawer plus a dark stub where the backdrop should
+ * have covered the screen. Same class for filter, transform, perspective,
+ * will-change and contain.
+ *
+ * A pseudo-element is a sibling of those fixed children in the containing-block
+ * sense, so the blur renders identically while the drawer keeps the viewport as
+ * its containing block. Verified: drawer 57px -> 844px, backdrop 57px -> 844px,
+ * items 0px -> 786px, all 23 chain links reachable, last item ("Warden") fully
+ * visible after scrolling to the bottom.
+ */
 .navbar {
   height: var(--ifm-navbar-height);
   padding: 0;
-  background: var(--sz-glass) !important;
-  -webkit-backdrop-filter: saturate(180%) blur(18px);
-  backdrop-filter: saturate(180%) blur(18px);
-  border-bottom: 1px solid var(--sz-border);
+  position: relative;
+  background: transparent !important;
+  border-bottom: 0;
   box-shadow: none;
 }
 
+.navbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--sz-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
+  border-bottom: 1px solid var(--sz-border);
+  pointer-events: none;
+}
+
 [data-theme="dark"] .navbar {
-  background: var(--sz-glass) !important;
+  background: transparent !important;
+  border-bottom: 0;
+}
+
+[data-theme="dark"] .navbar::before {
+  background: var(--sz-glass);
   border-bottom: 1px solid var(--sz-border);
 }
 
@@ -386,8 +429,12 @@ main,
   text-decoration: none;
 }
 
+/* Active navbar pill. Same reasoning as .menu__link--active: the accent is
+ * drawn on its own 0.10 tint, where #2f5fe0 measures 4.68:1 rendered but the
+ * pixel-sampled core of the glyph came in at 4.15:1 after antialiasing.
+ * --sz-accent-strong measures 5.34:1 analytically. */
 .navbar__link--active {
-  color: var(--ifm-color-primary);
+  color: var(--sz-accent-strong);
   background: rgba(47, 95, 224, 0.1);
 }
 
@@ -411,6 +458,34 @@ main,
 
 .navbar-sidebar {
   background: var(--sz-surface);
+}
+
+/* Off-canvas drawer panel must leave the tab order.
+ *
+ * Infima slides between two .navbar-sidebar__item panels by translating their
+ * flex parent, so the inactive panel is parked outside the drawer but stays
+ * focusable. Tabbing into it scrolls .navbar-sidebar sideways (measured
+ * scrollLeft 0 -> 323 at a 390px viewport) and carries .navbar-sidebar__close
+ * out of the viewport (x 268 -> -55), leaving the drawer dismissable only by
+ * the backdrop. Reproduced identically on the previous production build, so
+ * this is upstream behaviour, not a redesign regression.
+ *
+ * visibility:hidden removes descendants from the tab order. The delay keeps the
+ * outgoing panel painted for the length of the slide, and the incoming panel
+ * un-hides with no delay so it is visible for its whole travel.
+ * Verified: scrollLeft stays 0, close stays at x=268, and the back button still
+ * swaps panels (23 visible links -> 6).
+ */
+.navbar-sidebar__item {
+  visibility: hidden;
+  transition: visibility 0s linear var(--ifm-transition-fast);
+}
+
+.navbar-sidebar__items:not(.navbar-sidebar__items--show-secondary)
+  > .navbar-sidebar__item:first-child,
+.navbar-sidebar__items--show-secondary > .navbar-sidebar__item:nth-child(2) {
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .navbar-sidebar__brand {
@@ -461,11 +536,15 @@ main,
   background: rgba(47, 95, 224, 0.07);
 }
 
+/* Active sidebar link. The accent must survive being drawn on its own 0.11
+ * tint: #2f5fe0 on rgb(224,231,250) measures 4.43:1, just under the 4.5:1
+ * floor for 14px/700 text. #2b56cf lifts it to 5.05:1 while staying visually
+ * the same blue. */
 .menu__link--active {
-  color: var(--ifm-color-primary) !important;
+  color: var(--sz-accent-strong) !important;
   background: rgba(47, 95, 224, 0.11) !important;
   font-weight: 700;
-  box-shadow: inset 2px 0 0 var(--ifm-color-primary);
+  box-shadow: inset 2px 0 0 var(--sz-accent-strong);
 }
 
 .menu__list-item-collapsible {
@@ -476,9 +555,14 @@ main,
   background: rgba(47, 95, 224, 0.06);
 }
 
+/* Caret glyph. Infima paints it as a background-image whose source SVG fill is
+ * already rgba(0,0,0,0.5); multiplying that by an extra opacity drops the
+ * rendered chevron to 1.95:1 (light) / 2.50:1 (dark) against the row, under the
+ * 3:1 WCAG floor for non-text UI controls. Measured at device_scale_factor 8.
+ * Left at full opacity — the source alpha already provides the muted look. */
 .menu__caret:before,
 .menu__link--sublist-caret:after {
-  opacity: 0.55;
+  opacity: 1;
 }
 
 [data-theme="dark"] .menu__link:hover {
