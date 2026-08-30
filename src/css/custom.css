@@ -1050,6 +1050,18 @@ div[class^="codeBlockTitle"] {
   transform: translateX(3px);
 }
 
+.sz-footer__linkIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sz-ink-faint);
+  transition: color 160ms var(--sz-ease);
+}
+
+.sz-footer__links a:hover .sz-footer__linkIcon {
+  color: var(--ifm-color-primary);
+}
+
 .sz-footer__ext {
   /* Was opacity:.55 -> composited to #aab0bf on white = 2.17:1 (WCAG fail).
      Explicit token instead: 6.37:1 light, 6.65:1 dark. */

@@ -19,24 +19,24 @@ const SERVICE_LINKS: ExternalLink[] = [
 
 const SOCIALS = [
   {
-    label: "X (Twitter)",
+    label: "X / Twitter",
     href: "https://x.com/shazoes",
-    icon: <FaXTwitter size={18} />,
+    icon: <FaXTwitter size={16} />,
   },
   {
     label: "Discord",
     href: "http://discordapp.com/users/906483432811561000",
-    icon: <FaDiscord size={18} />,
+    icon: <FaDiscord size={16} />,
   },
   {
     label: "Telegram",
     href: "https://t.me/shazoes",
-    icon: <FaTelegram size={18} />,
+    icon: <FaTelegram size={16} />,
   },
   {
-    label: "Email",
+    label: "hello@shazoes.xyz",
     href: "mailto:hello@shazoes.xyz",
-    icon: <FaEnvelope size={18} />,
+    icon: <FaEnvelope size={16} />,
   },
 ];
 
@@ -55,21 +55,6 @@ const Footer = (): React.ReactNode => {
                 Cosmos ecosystem — nodes, relayers, explorers and faucets kept
                 running around the clock.
               </p>
-              <div className="sz-footer__social">
-                {SOCIALS.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    className="sz-footer__socialLink"
-                    aria-label={s.label}
-                    {...(s.href.startsWith("mailto:")
-                      ? {}
-                      : { target: "_blank", rel: "noopener noreferrer" })}
-                  >
-                    {s.icon}
-                  </a>
-                ))}
-              </div>
             </div>
 
             {/* Networks */}
@@ -109,33 +94,21 @@ const Footer = (): React.ReactNode => {
             <div>
               <p className="sz-footer__col-title">Connect</p>
               <ul className="sz-footer__links">
-                <li>
-                  <a
-                    href="https://x.com/shazoes"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    X / Twitter
-                    <span className="sz-footer__ext" aria-hidden="true">
-                      ↗
-                    </span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://t.me/shazoes"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Telegram
-                    <span className="sz-footer__ext" aria-hidden="true">
-                      ↗
-                    </span>
-                  </a>
-                </li>
-                <li>
-                  <a href="mailto:hello@shazoes.xyz">hello@shazoes.xyz</a>
-                </li>
+                {SOCIALS.map((s) => (
+                  <li key={s.label}>
+                    <a
+                      href={s.href}
+                      {...(s.href.startsWith("mailto:")
+                        ? {}
+                        : { target: "_blank", rel: "noopener noreferrer" })}
+                    >
+                      <span className="sz-footer__linkIcon" aria-hidden="true">
+                        {s.icon}
+                      </span>
+                      {s.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -144,10 +117,6 @@ const Footer = (): React.ReactNode => {
             <p className="sz-footer__copy">
               &copy; {new Date().getFullYear()} Shazoes · All rights reserved.
             </p>
-            <span className="sz-footer__note">
-              <span className="sz-footer__dot" aria-hidden="true" />
-              Infrastructure operational
-            </span>
           </div>
         </div>
       </div>

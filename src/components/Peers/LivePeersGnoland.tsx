@@ -268,18 +268,6 @@ sudo systemctl restart ${binaryName} && sudo journalctl -u ${binaryName} -f --no
           <span className={styles.chipDot} />
           Online
         </span>
-        <span className={styles.endpointBox}>
-          <span className={styles.endpointLabel}>Answered by</span>
-          <a
-            className={styles.endpointValue}
-            href={`${sourceEndpoint.replace(/\/+$/, "")}/net_info`}
-            target="_blank"
-            rel="noreferrer noopener"
-            title={sourceEndpoint}
-          >
-            {prettyEndpoint(sourceEndpoint)}
-          </a>
-        </span>
         <span
           className={styles.countPill}
           title={`${usedPeerCount} peers listed${
