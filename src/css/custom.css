@@ -145,14 +145,18 @@
    * so the accent stays at the primary value. */
   --sz-accent-strong: #8aa9ff;
 
-  --sz-bg: #06070c;
-  --sz-surface: #0e1119;
-  --sz-surface-2: #141926;
-  --sz-surface-3: #1a2130;
-  --sz-glass: rgba(14, 17, 25, 0.72);
-  --sz-glass-strong: rgba(10, 12, 18, 0.88);
+  /* Raised from #06070c: near-pure-black caused halation/bloom against bright
+     ink (heading was 17.95:1). Lifting the base + surfaces one step keeps card
+     elevation while cutting the glare. Dark mode only. */
+  --sz-bg: #0d1017;
+  --sz-surface: #161b26;
+  --sz-surface-2: #1c2230;
+  --sz-surface-3: #232b3b;
+  --sz-glass: rgba(20, 24, 34, 0.72);
+  --sz-glass-strong: rgba(16, 19, 28, 0.9);
 
-  --sz-ink: #eef2fb;
+  /* Softened from #eef2fb (18:1 → ~15:1) — still well above WCAG, no bloom. */
+  --sz-ink: #e2e6ef;
   --sz-ink-soft: #c3ccdd;
   --sz-ink-muted: #97a2b8;
   --sz-ink-faint: #8b96ad;
@@ -245,10 +249,10 @@ body {
 
 [data-theme="dark"] body {
   background-image:
-    radial-gradient(ellipse 78% 52% at 6% -8%, rgba(70, 104, 220, 0.22), transparent 62%),
-    radial-gradient(ellipse 64% 48% at 98% 0%, rgba(122, 74, 214, 0.18), transparent 58%),
-    radial-gradient(ellipse 74% 42% at 46% 106%, rgba(16, 132, 164, 0.14), transparent 62%),
-    linear-gradient(180deg, #06070c 0%, #080a12 44%, #0a0d16 100%);
+    radial-gradient(ellipse 78% 52% at 6% -8%, rgba(70, 104, 220, 0.18), transparent 62%),
+    radial-gradient(ellipse 64% 48% at 98% 0%, rgba(122, 74, 214, 0.15), transparent 58%),
+    radial-gradient(ellipse 74% 42% at 46% 106%, rgba(16, 132, 164, 0.12), transparent 62%),
+    linear-gradient(180deg, #0d1017 0%, #10141d 44%, #121722 100%);
 }
 
 /* Micro-grain — static overlay, gives the surface depth without motion */

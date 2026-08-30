@@ -153,6 +153,16 @@
   color: #080a12;
 }
 
+/* Dark mode: halve the CTA bloom. A soft glow on a dark surface is the main
+   eye-strain trigger — the soft edge gives the eye nothing to focus on. */
+[data-theme="dark"] .heroCta {
+  box-shadow: 0 6px 16px -10px rgba(47, 95, 224, 0.3);
+}
+
+[data-theme="dark"] .heroCta:hover {
+  box-shadow: 0 10px 24px -14px rgba(122, 152, 255, 0.28);
+}
+
 .heroGhost {
   color: var(--sz-ink);
   /* No backdrop-filter: transforms on hover flicker (documented regression). */
