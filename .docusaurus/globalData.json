@@ -8,16 +8,31 @@
           "label": "Next",
           "isLast": true,
           "path": "/yay",
-          "mainDocId": "mainnets/atomone/upgrade",
+          "mainDocId": "index",
           "docs": [
+            {
+              "id": "index",
+              "path": "/yay/",
+              "sidebar": "docSidebar"
+            },
             {
               "id": "mainnets/atomone/upgrade",
               "path": "/yay/mainnets/atomone/upgrade",
               "sidebar": "docSidebar"
             },
             {
+              "id": "mainnets/index",
+              "path": "/yay/mainnets/",
+              "sidebar": "docSidebar"
+            },
+            {
               "id": "testnets/atomone/upgrade",
               "path": "/yay/testnets/atomone/upgrade",
+              "sidebar": "docSidebar"
+            },
+            {
+              "id": "testnets/index",
+              "path": "/yay/testnets/",
               "sidebar": "docSidebar"
             },
             {
@@ -30,8 +45,8 @@
           "sidebars": {
             "docSidebar": {
               "link": {
-                "path": "/yay/mainnets/atomone/upgrade",
-                "label": "mainnets/atomone/upgrade"
+                "path": "/yay/",
+                "label": "Overview"
               }
             }
           }

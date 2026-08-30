@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import styles from "./UpgradeRemainingBlock.module.css";
 
 /**
  * Fetch the latest block height, trying multiple RPC endpoints in order.
@@ -69,29 +70,43 @@ export default function UpgradeRemainingBlock({
 
   if (error) {
     return (
-      <span>
-        <i>RPC unavailable — unable to fetch block height</i>
+      <span className={`${styles.chip} ${styles.chipError}`} role="status">
+        <span className={styles.dot} aria-hidden="true" />
+        <span className={styles.status}>
+          RPC unavailable — unable to fetch block height
+        </span>
       </span>
     );
   }
 
+  if (remaining === null) {
+    return (
+      <span className={`${styles.chip} ${styles.chipLoading}`} role="status">
+        <span className={styles.dot} aria-hidden="true" />
+        <span className={styles.status}>Loading…</span>
+      </span>
+    );
+  }
+
+  const blocksLeft = remaining >= 0 ? remaining : 0;
+
   return (
-    <span>
-      {remaining !== null ? (
-        <strong>{remaining >= 0 ? remaining : 0} </strong>
-      ) : (
-        <i>Loading...</i>
-      )}
-      &nbsp;|&nbsp;
-      <strong>
-        <i>
-          {remaining !== null
-            ? reached
-              ? "Block reached, please upgrade."
-              : "Please don't upgrade before the specified height."
-            : ""}
-        </i>
-      </strong>
+    <span
+      className={`${styles.chip} ${
+        reached ? styles.chipReached : styles.chipPending
+      }`}
+      role="status"
+      aria-live="polite"
+    >
+      <span className={styles.dot} aria-hidden="true" />
+      <span className={styles.count}>{blocksLeft.toLocaleString("en-US")}</span>
+      <span className={styles.unit}>blocks</span>
+      <span className={styles.sep} aria-hidden="true" />
+      <span className={styles.status}>
+        {reached
+          ? "Block reached, please upgrade."
+          : "Please don't upgrade before the specified height."}
+      </span>
     </span>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
 import { expandRpcFallbacks } from "./rpcFallbackMap";
+import styles from "./LivePeers.module.css";
 
 interface LivePeersProps {
   /** Primary RPC (string) or ordered list of RPCs to try. */
@@ -70,6 +71,11 @@ function shuffleArray(array: string[]) {
   return arr;
 }
 
+/** Compact display form of an RPC URL — protocol stripped, no trailing slash. */
+function prettyEndpoint(url: string): string {
+  return url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+}
+
 export default function LivePeers({
   rpc,
   rpcs,
@@ -83,13 +89,17 @@ export default function LivePeers({
   const [usedPeerCount, setUsedPeerCount] = useState(0);
   const [status, setStatus] = useState<Status>("loading");
   const [triedCount, setTriedCount] = useState(0);
-  const [lastError, setLastError] = useState<string>("");
+  const [totalEndpoints, setTotalEndpoints] = useState(0);
+  const [activeEndpoint, setActiveEndpoint] = useState("");
+  const [sourceEndpoint, setSourceEndpoint] = useState("");
+  const [errorList, setErrorList] = useState<string[]>([]);
 
   useEffect(() => {
     const endpoints = normalizeRpcList(rpc, rpcs);
+    setTotalEndpoints(endpoints.length);
     if (endpoints.length === 0) {
       setStatus("error");
-      setLastError("No RPC endpoint configured.");
+      setErrorList([]);
       return;
     }
 
@@ -97,8 +107,9 @@ export default function LivePeers({
 
     async function fetchPeers() {
       setStatus("loading");
-      setLastError("");
+      setErrorList([]);
       setTriedCount(0);
+      setSourceEndpoint("");
 
       const errors: string[] = [];
 
@@ -106,13 +117,16 @@ export default function LivePeers({
         if (cancelled) return;
         const endpoint = endpoints[i];
         setTriedCount(i + 1);
+        setActiveEndpoint(endpoint);
         try {
           const data = await fetchNetInfo(endpoint);
           const allPeers = peersFromNetInfo(data);
           if (allPeers.length === 0) {
-            // reachable but empty — try next if available
+            // Reachable but no peers — never render an empty box. Try the next
+            // endpoint; if this was the last one the loop ends in the honest
+            // "no endpoint responded" state.
             errors.push(`${endpoint}: empty peer list`);
-            if (i < endpoints.length - 1) continue;
+            continue;
           }
 
           if (cancelled) return;
@@ -123,6 +137,7 @@ export default function LivePeers({
           setPeerCount(allPeers.length);
           setUsedPeerCount(shuffledPeers.length);
           setPeersOnly(peersString);
+          setSourceEndpoint(endpoint);
           setScriptOutput(
             `PEERS="${peersString}"
 sed -i 's|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/${homeFolder}/config/config.toml
@@ -143,7 +158,7 @@ sudo systemctl restart ${binaryName} && sudo journalctl -u ${binaryName} -f --no
 
       if (cancelled) return;
       setStatus("error");
-      setLastError(errors.slice(-3).join(" · ") || "all RPCs failed");
+      setErrorList(errors.slice(-3));
     }
 
     fetchPeers();
@@ -152,37 +167,162 @@ sudo systemctl restart ${binaryName} && sudo journalctl -u ${binaryName} -f --no
     };
   }, [rpc, rpcs, homeFolder, binaryName, maxPeers]);
 
+  /* ------------------------------- FAILED ------------------------------- */
   if (status === "error") {
+    // Distinguish "nothing answered" from "answered but returned no peers" so
+    // the message is never misleading.
+    const noEndpoints = totalEndpoints === 0;
+    const answeredButEmpty =
+      !noEndpoints &&
+      errorList.length > 0 &&
+      errorList.every((line) => line.endsWith("empty peer list"));
+    const failTitle = noEndpoints
+      ? "No RPC endpoint configured"
+      : answeredButEmpty
+        ? "No peers returned by any RPC endpoint"
+        : "No RPC endpoint responded";
     return (
-      <>
-        <p>
-          <strong>Failed to fetch peer data</strong> after trying{" "}
-          {triedCount || "all"} RPC endpoint{triedCount === 1 ? "" : "s"}.
-        </p>
-        <CodeBlock language="bash">
-          {`All configured RPCs failed (down, CORS, or network).
-${lastError ? `Last errors: ${lastError}` : ""}
-Tip: open the RPC /net_info URL in a new tab — if it fails there too, the node is down.`}
-        </CodeBlock>
-      </>
+      <div className={styles.wrap}>
+        <div className={styles.statusBar}>
+          <span className={`${styles.chip} ${styles.chipOffline}`}>
+            <span className={styles.chipDot} />
+            Offline
+          </span>
+          <span className={styles.endpointBox}>
+            <span className={styles.endpointLabel}>RPC source</span>
+            <span className={`${styles.endpointValue} ${styles.endpointMuted}`}>
+              no endpoint responded
+            </span>
+          </span>
+          <span className={styles.countPill}>
+            <span className={styles.countNum}>0</span>
+            <span className={styles.countUnit}>peers</span>
+          </span>
+        </div>
+
+        <div className={styles.fail}>
+          <span className={styles.failTitle}>{failTitle}</span>
+          {noEndpoints ? (
+            <p className={styles.failBody}>
+              This component received no usable RPC URL, so nothing was
+              requested. Pass an <code>rpc</code> (and optionally{" "}
+              <code>rpcs</code>) prop.
+            </p>
+          ) : (
+            <p className={styles.failBody}>
+              Tried {triedCount || totalEndpoints} of {totalEndpoints} RPC
+              endpoint{totalEndpoints === 1 ? "" : "s"}, sequentially
+              {answeredButEmpty
+                ? " — each one answered with an empty peer list."
+                : " — every one failed (node down, CORS blocked, or network error)."}{" "}
+              No peer list is shown because there is no live data to show.
+            </p>
+          )}
+          {errorList.length > 0 ? (
+            <ul className={styles.failList}>
+              {errorList.map((line, idx) => (
+                <li key={`${idx}-${line}`} className={styles.failItem}>
+                  {line}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {noEndpoints ? null : (
+            <p className={styles.failHint}>
+              Tip: open the RPC <code>/net_info</code> URL in a new tab — if it
+              fails there too, the node is down.
+            </p>
+          )}
+        </div>
+      </div>
     );
   }
 
+  /* ------------------------------ LOADING ------------------------------ */
+  if (status === "loading") {
+    return (
+      <div className={styles.wrap}>
+        <div className={styles.statusBar}>
+          <span className={`${styles.chip} ${styles.chipPending}`}>
+            <span className={styles.chipDot} />
+            Checking
+          </span>
+          <span className={styles.endpointBox}>
+            <span className={styles.endpointLabel}>RPC source</span>
+            <span className={`${styles.endpointValue} ${styles.endpointMuted}`}>
+              {activeEndpoint ? prettyEndpoint(activeEndpoint) : "resolving…"}
+            </span>
+          </span>
+          <span className={styles.countPill}>
+            <span className={styles.countNum}>—</span>
+            <span className={styles.countUnit}>peers</span>
+          </span>
+        </div>
+
+        <div className={styles.loading}>
+          <span className={styles.loadingText}>Fetching peers…</span>
+          <span className={styles.loadingMeta}>
+            endpoint {triedCount || 1}/{totalEndpoints || 1} · sequential, no
+            retries
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  /* -------------------------------- OK -------------------------------- */
   return (
-    <>
-      <p>
-        Number of active Peers <strong>{usedPeerCount}</strong>
-        {peerCount > usedPeerCount ? (
-          <>
-            {" "}
-            (of {peerCount} total)
-          </>
-        ) : null}
-      </p>
-      <CodeBlock language="bash">{peersOnly || "Loading peers…"}</CodeBlock>
-      <CodeBlock language="bash">
-        {scriptOutput || "Loading config script…"}
-      </CodeBlock>
-    </>
+    <div className={styles.wrap}>
+      <div className={styles.statusBar}>
+        <span className={`${styles.chip} ${styles.chipOnline}`}>
+          <span className={styles.chipDot} />
+          Online
+        </span>
+        <span className={styles.endpointBox}>
+          <span className={styles.endpointLabel}>Answered by</span>
+          <a
+            className={styles.endpointValue}
+            href={`${sourceEndpoint.replace(/\/+$/, "")}/net_info`}
+            target="_blank"
+            rel="noreferrer noopener"
+            title={sourceEndpoint}
+          >
+            {prettyEndpoint(sourceEndpoint)}
+          </a>
+        </span>
+        <span
+          className={styles.countPill}
+          title={`${usedPeerCount} peers listed${
+            peerCount > usedPeerCount ? ` of ${peerCount} connected` : ""
+          }`}
+        >
+          <span className={styles.countNum}>{usedPeerCount}</span>
+          {peerCount > usedPeerCount ? (
+            <span className={styles.countTotal}>/{peerCount}</span>
+          ) : null}
+          <span className={styles.countUnit}>peers</span>
+        </span>
+      </div>
+
+      <div className={styles.frame}>
+        <div className={styles.frameHead}>
+          <span className={styles.frameTitle}>persistent_peers</span>
+          <span className={styles.frameHint}>copy &amp; paste</span>
+        </div>
+        <div className={styles.frameBody}>
+          <CodeBlock language="bash">{peersOnly}</CodeBlock>
+        </div>
+      </div>
+
+      <div className={styles.frame}>
+        <div className={styles.frameHead}>
+          <span className={styles.frameTitle}>apply to config.toml</span>
+          <span className={styles.frameHint}>then restart</span>
+        </div>
+        <div className={styles.frameBody}>
+          <CodeBlock language="bash">{scriptOutput}</CodeBlock>
+        </div>
+      </div>
+    </div>
   );
 }

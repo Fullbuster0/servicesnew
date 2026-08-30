@@ -1232,19 +1232,37 @@ export default [
   },
   {
     path: '/yay',
-    component: ComponentCreator('/yay', '132'),
+    component: ComponentCreator('/yay', 'db4'),
     routes: [
       {
         path: '/yay',
-        component: ComponentCreator('/yay', '850'),
+        component: ComponentCreator('/yay', '771'),
         routes: [
           {
             path: '/yay',
-            component: ComponentCreator('/yay', '903'),
+            component: ComponentCreator('/yay', '33d'),
             routes: [
+              {
+                path: '/yay/',
+                component: ComponentCreator('/yay/', '69d'),
+                exact: true,
+                sidebar: "docSidebar"
+              },
+              {
+                path: '/yay/mainnets/',
+                component: ComponentCreator('/yay/mainnets/', '91b'),
+                exact: true,
+                sidebar: "docSidebar"
+              },
               {
                 path: '/yay/mainnets/atomone/upgrade',
                 component: ComponentCreator('/yay/mainnets/atomone/upgrade', 'db0'),
+                exact: true,
+                sidebar: "docSidebar"
+              },
+              {
+                path: '/yay/testnets/',
+                component: ComponentCreator('/yay/testnets/', '48f'),
                 exact: true,
                 sidebar: "docSidebar"
               },

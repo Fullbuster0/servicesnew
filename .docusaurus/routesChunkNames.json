@@ -827,22 +827,34 @@
     "__comp": "17896441",
     "content": "bd5a41bb"
   },
-  "/yay-132": {
+  "/yay-db4": {
     "__comp": "5e95c892",
     "__context": {
       "plugin": "aba21aa0"
     }
   },
-  "/yay-850": {
+  "/yay-771": {
     "__comp": "a7bd4aaa",
     "__props": "d0d2ee26"
   },
-  "/yay-903": {
+  "/yay-33d": {
     "__comp": "a94703ab"
+  },
+  "/yay/-69d": {
+    "__comp": "17896441",
+    "content": "c377a04b"
+  },
+  "/yay/mainnets/-91b": {
+    "__comp": "17896441",
+    "content": "d68b2391"
   },
   "/yay/mainnets/atomone/upgrade-db0": {
     "__comp": "17896441",
     "content": "88332264"
+  },
+  "/yay/testnets/-48f": {
+    "__comp": "17896441",
+    "content": "e1d8c213"
   },
   "/yay/testnets/atomone/upgrade-06c": {
     "__comp": "17896441",

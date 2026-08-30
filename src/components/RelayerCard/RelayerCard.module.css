@@ -1,182 +1,221 @@
-/* RelayerCard — route card. Mirrors Card.module.css language:
- * solid panel, top accent bar (scaleX on hover), lift on hover.
- * Theming via [data-theme] (Docusaurus), NOT prefers-color-scheme. */
+/*
+ * RelayerCard — v2 "Aurora Glass"
+ * IBC route card: chain A ⇄ chain B, wallet pills, gradient connector.
+ * Tokens (--sz-*) from src/css/custom.css. Theming via [data-theme].
+ */
 
 .card {
   position: relative;
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  padding: 1.35rem 1.5rem 1.15rem;
+  padding: 1.4rem 1.5rem 1.25rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-lg);
+  background: var(--sz-surface);
+  box-shadow: var(--sz-sh-1);
   overflow: hidden;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
+  isolation: isolate;
+  transition: transform 250ms var(--sz-ease), box-shadow 250ms var(--sz-ease),
+    border-color 250ms var(--sz-ease);
 }
 
-/* top accent — short at rest, full width on hover */
 .card::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset: 0 0 auto 0;
   height: 2px;
-  background: linear-gradient(90deg, #005fcc, #764bc8);
-  transform: scaleX(0.18);
+  background: var(--sz-grad-brand);
+  transform: scaleX(0.22);
   transform-origin: left center;
   pointer-events: none;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 320ms var(--sz-ease);
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -60% auto;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 77, 234, 0.12), transparent 68%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 320ms var(--sz-ease);
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(0, 95, 204, 0.28);
-  box-shadow: 0 12px 28px -16px rgba(0, 95, 204, 0.35);
+  transform: translateY(-4px);
+  border-color: var(--sz-border-strong);
+  box-shadow: var(--sz-sh-3);
 }
 
 .card:hover::before {
   transform: scaleX(1);
 }
 
+.card:hover::after {
+  opacity: 1;
+}
+
 [data-theme="dark"] .card {
-  background: #121824;
-  border-color: rgba(148, 163, 184, 0.1);
+  background: linear-gradient(180deg, var(--sz-surface-2) 0%, var(--sz-surface) 100%);
 }
 
-[data-theme="dark"] .card::before {
-  background: linear-gradient(90deg, #5a86bc, #7a6bb0);
+[data-theme="dark"] .card::after {
+  background: radial-gradient(circle, rgba(178, 140, 255, 0.14), transparent 68%);
 }
 
-[data-theme="dark"] .card:hover {
-  border-color: rgba(122, 168, 224, 0.3);
-  box-shadow: 0 12px 28px -16px rgba(0, 0, 0, 0.6);
-}
-
-/* ---------- Route layout: chain A ⇄ chain B ---------- */
-
+/* ---------------------------- ROUTE LAYOUT ---------------------------- */
 .imageRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
 .imageWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   flex: 1;
   min-width: 0;
 }
 
 .image {
-  width: 3.4rem;
-  height: 3.4rem;
-  object-fit: cover;
-  border-radius: 14px;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 3.15rem;
+  height: 3.15rem;
+  padding: 3px;
+  object-fit: contain;
+  border: 1px solid var(--sz-border);
+  border-radius: 15px;
+  background: var(--sz-surface-2);
+  transition: transform 280ms var(--sz-ease), border-color 280ms var(--sz-ease);
 }
 
 .card:hover .image {
-  transform: scale(1.06);
+  transform: translateY(-2px) scale(1.04);
+  border-color: var(--sz-border-strong);
 }
 
 .title {
-  margin: 0.55rem 0 0;
-  font-size: 0.92rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #0f172a;
-}
-
-[data-theme="dark"] .title {
-  color: #e8ecf4;
+  margin: 0.6rem 0 0;
+  max-width: 100%;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  line-height: 1.3;
+  color: var(--sz-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .subtitle {
-  display: inline-block;
-  margin-top: 0.3rem;
-  font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-  font-size: 0.62rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--sz-border-strong);
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-surface-2);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #005fcc;
-  padding: 0.18rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 95, 204, 0.25);
-  background: rgba(0, 95, 204, 0.06);
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease;
+  color: var(--sz-ink-muted);
+  min-height: 32px;
+  transition: color 180ms var(--sz-ease), background 180ms var(--sz-ease),
+    border-color 180ms var(--sz-ease);
 }
 
 .subtitle:hover {
-  background: rgba(0, 95, 204, 0.12);
-  border-color: rgba(0, 95, 204, 0.45);
+  color: var(--ifm-color-primary);
+  background: rgba(47, 95, 224, 0.09);
+  border-color: var(--ifm-color-primary);
   text-decoration: none;
 }
 
-[data-theme="dark"] .subtitle {
-  color: #8eb4e0;
-  border-color: rgba(122, 168, 224, 0.25);
-  background: rgba(74, 116, 168, 0.12);
-}
-
 [data-theme="dark"] .subtitle:hover {
-  background: rgba(74, 116, 168, 0.22);
-  border-color: rgba(122, 168, 224, 0.45);
+  background: rgba(138, 169, 255, 0.11);
 }
 
-/* ---------- Arrow ---------- */
-
+/* ------------------------------ CONNECTOR ------------------------------ */
 .arrow {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  color: #9db4d0;
-  padding-bottom: 1.6rem;
+  width: 48px;
+  height: 3.15rem;
+  color: var(--sz-ink-faint);
+  transition: color 240ms var(--sz-ease);
 }
 
-[data-theme="dark"] .arrow {
-  color: #5d84b4;
+/* hairline rail behind the glyph so the route reads as a "link" */
+.arrow::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sz-border-strong), transparent);
+}
+
+.card:hover .arrow {
+  color: var(--ifm-color-primary);
 }
 
 .arrowIcon {
-  width: 44px;
-  height: 30px;
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 22px;
+  padding: 0 2px;
   fill: currentColor;
+  background: var(--sz-surface);
+  transition: transform 280ms var(--sz-ease);
 }
 
-/* ---------- Mobile ---------- */
+[data-theme="dark"] .arrowIcon {
+  background: var(--sz-surface-2);
+}
 
+.card:hover .arrowIcon {
+  transform: scale(1.08);
+}
+
+/* ------------------------------- MOBILE ------------------------------- */
 @media (max-width: 450px) {
   .card {
-    padding: 1rem 0.9rem 0.9rem;
+    padding: 1.05rem 0.95rem 0.95rem;
   }
-
   .image {
-    width: 2.6rem;
-    height: 2.6rem;
-    border-radius: 11px;
+    width: 2.55rem;
+    height: 2.55rem;
+    border-radius: 12px;
   }
-
   .title {
     font-size: 0.8rem;
   }
-
   .subtitle {
-    font-size: 0.56rem;
-    padding: 0.14rem 0.45rem;
+    /* was 0.55rem = 8.8px computed (smallest text on the site) + a 52.6x20.3
+       tap target. Floor is now 11.2px with a 32px-tall hit area. */
+    font-size: 0.72rem;
+    padding: 0.42rem 0.62rem;
+    min-height: 32px;
   }
-
   .arrow {
-    padding-bottom: 1.3rem;
-  }
-
-  .arrowIcon {
     width: 34px;
-    height: 24px;
+    height: 2.55rem;
+  }
+  .arrowIcon {
+    width: 24px;
+    height: 18px;
   }
 }

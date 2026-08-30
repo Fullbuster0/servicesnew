@@ -12,8 +12,12 @@
   "version": "current",
   "frontMatter": {},
   "sidebar": "docSidebar",
+  "previous": {
+    "title": "Mainnets",
+    "permalink": "/yay/mainnets/"
+  },
   "next": {
-    "title": "Atomone Testnet",
-    "permalink": "/yay/testnets/atomone/upgrade"
+    "title": "Testnets",
+    "permalink": "/yay/testnets/"
   }
 }

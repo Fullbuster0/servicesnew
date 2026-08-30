@@ -1,0 +1,565 @@
+/*
+ * ============================================================================
+ * SNAPSHOT CARD — v2 "Aurora Glass"
+ * Frosted panel + gradient rail (matches Card.module.css), mono tabular
+ * metadata rows, copy-pasteable command block, static loading placeholder
+ * and a designed "metadata unavailable" state.
+ * All theming via [data-theme]; tokens from custom.css. No looping motion.
+ *
+ * NOTE ON SPECIFICITY: this component renders inside `.markdown`, where
+ * custom.css defines `.markdown h3` and `.markdown code:not(pre code)`, and
+ * Bootstrap's reboot styles bare `pre` / `code` / `button`. Text-level rules
+ * are therefore scoped as `.panel .x` so they win without any !important.
+ * ============================================================================
+ */
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0.75rem 0 1.35rem;
+  padding: 1.1rem 1.15rem 1.05rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-lg);
+  background: var(--sz-surface);
+  color: var(--ifm-font-color-base);
+  box-shadow: var(--sz-sh-1);
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color 260ms var(--sz-ease), box-shadow 260ms var(--sz-ease);
+}
+
+/* Left gradient rail — same language as the chain cards */
+.panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--sz-grad-brand);
+  opacity: 0.32;
+  pointer-events: none;
+  transition: opacity 320ms var(--sz-ease);
+}
+
+/* Static corner bloom, revealed on hover (no filter/blur) */
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: -40% -30% auto auto;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(47, 95, 224, 0.14), transparent 68%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 320ms var(--sz-ease);
+}
+
+.panel:hover {
+  border-color: var(--sz-border-strong);
+  box-shadow: var(--sz-sh-2);
+}
+
+.panel:hover::before {
+  opacity: 1;
+}
+
+.panel:hover::after {
+  opacity: 1;
+}
+
+[data-theme="dark"] .panel {
+  background: linear-gradient(180deg, var(--sz-surface-2) 0%, var(--sz-surface) 100%);
+}
+
+[data-theme="dark"] .panel::after {
+  background: radial-gradient(circle, rgba(138, 169, 255, 0.16), transparent 68%);
+}
+
+/* ------------------------------- HEADER ------------------------------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+  z-index: 2;
+}
+
+.headerMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.panel .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--sz-ink-faint);
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.panel .title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  line-height: 1.2;
+  color: var(--sz-ink);
+}
+
+/* Chain slug → mono chip (beats `.markdown code:not(pre code)`) */
+.panel .chainTag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.14rem 0.48rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-xs);
+  background: var(--sz-surface-2);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  color: var(--sz-ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .panel .chainTag {
+  color: var(--sz-ink-muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Status pill (fresh / stale / unavailable / loading) */
+.panel .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--sz-r-pill);
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.panel .statusOk {
+  color: var(--sz-emerald-ink);
+  background: rgba(15, 159, 120, 0.1);
+  border: 1px solid rgba(15, 159, 120, 0.26);
+}
+
+.panel .statusStale {
+  color: var(--sz-amber-ink);
+  background: rgba(200, 128, 26, 0.1);
+  border: 1px solid rgba(200, 128, 26, 0.26);
+}
+
+.panel .statusDown {
+  color: var(--sz-rose-ink);
+  background: rgba(217, 69, 95, 0.1);
+  border: 1px solid rgba(217, 69, 95, 0.26);
+}
+
+.panel .statusIdle {
+  color: var(--sz-slate-ink);
+  background: rgba(100, 116, 139, 0.12);
+  border: 1px solid rgba(100, 116, 139, 0.26);
+}
+
+[data-theme="dark"] .panel .statusOk {
+  background: rgba(71, 214, 165, 0.12);
+  border-color: rgba(71, 214, 165, 0.26);
+}
+
+[data-theme="dark"] .panel .statusStale {
+  background: rgba(240, 179, 87, 0.12);
+  border-color: rgba(240, 179, 87, 0.26);
+}
+
+[data-theme="dark"] .panel .statusDown {
+  background: rgba(255, 125, 146, 0.12);
+  border-color: rgba(255, 125, 146, 0.26);
+}
+
+[data-theme="dark"] .panel .statusIdle {
+  background: rgba(148, 163, 184, 0.11);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+/* ------------------------------ METADATA ------------------------------ */
+/* 1px gap + hairline background = crisp dividers without double borders */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 1px;
+  border: 1px solid var(--sz-hairline);
+  border-radius: var(--sz-r-md);
+  background: var(--sz-hairline);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.65rem 0.8rem;
+  background: var(--sz-surface-2);
+  min-width: 0;
+}
+
+[data-theme="dark"] .row {
+  background: rgba(255, 255, 255, 0.022);
+}
+
+.panel .key {
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--sz-ink-faint);
+}
+
+.panel .value {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  color: var(--sz-ink);
+  overflow-wrap: anywhere;
+}
+
+.panel .valueMuted {
+  color: var(--sz-ink-muted);
+  font-weight: 500;
+}
+
+.panel .valueSub {
+  margin-top: 0.05rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--sz-ink-faint);
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------ COMMAND ------------------------------ */
+.command {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.commandHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.panel .commandLabel {
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--sz-ink-faint);
+}
+
+.panel .copyButton {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0.28rem 0.6rem;
+  border: 1px solid var(--sz-border-strong);
+  border-radius: var(--sz-r-xs);
+  background: var(--sz-surface-2);
+  color: var(--sz-ink-soft);
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 180ms var(--sz-ease), background 180ms var(--sz-ease),
+    border-color 180ms var(--sz-ease), transform 180ms var(--sz-ease);
+}
+
+.panel .copyButton:hover {
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  background: rgba(47, 95, 224, 0.08);
+  transform: translateY(-1px);
+}
+
+.panel .copyButton:focus-visible {
+  outline: none;
+  box-shadow: var(--sz-focus);
+}
+
+.panel .copyButton:active {
+  transform: translateY(0) scale(0.97);
+}
+
+[data-theme="dark"] .panel .copyButton:hover {
+  background: rgba(138, 169, 255, 0.11);
+}
+
+.panel .copyButtonDone {
+  color: var(--sz-emerald-ink);
+  border-color: rgba(15, 159, 120, 0.4);
+  background: rgba(15, 159, 120, 0.1);
+}
+
+[data-theme="dark"] .panel .copyButtonDone {
+  background: rgba(71, 214, 165, 0.12);
+  border-color: rgba(71, 214, 165, 0.34);
+}
+
+/* Copy-pasteable: real <pre>, selectable, wraps — never truncated,
+   no text-transform, no ellipsis. */
+.panel .commandBlock {
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-md);
+  background: var(--sz-surface-3);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.775rem;
+  font-weight: 500;
+  line-height: 1.65;
+  color: var(--sz-ink);
+  text-transform: none;
+  text-overflow: clip;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+  -webkit-user-select: text;
+  user-select: text;
+  tab-size: 2;
+}
+
+[data-theme="dark"] .panel .commandBlock {
+  background: rgba(6, 7, 12, 0.62);
+  border-color: var(--sz-border-strong);
+}
+
+/* Neutralise the global inline-code chip inside the command block */
+.panel .commandBlock code {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  white-space: inherit;
+  overflow-wrap: inherit;
+}
+
+/* ------------------------------- FOOTER ------------------------------- */
+.footnote {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--sz-hairline);
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--sz-ink-faint);
+  z-index: 2;
+}
+
+.panel .footnoteMono {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--sz-ink-muted);
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------- LOADING (STATIC) -------------------------- */
+/* Deliberately static muted blocks — no shimmer, no looping animation. */
+.placeholder {
+  display: block;
+  border-radius: var(--sz-r-xs);
+  background: var(--sz-surface-3);
+  border: 1px solid var(--sz-hairline);
+}
+
+[data-theme="dark"] .placeholder {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.placeholderTitle {
+  width: 148px;
+  height: 15px;
+}
+
+.placeholderTag {
+  width: 96px;
+  height: 12px;
+}
+
+.placeholderValue {
+  width: 68%;
+  min-width: 54px;
+  height: 12px;
+}
+
+.placeholderCommand {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--sz-r-md);
+}
+
+.panelLoading::before {
+  background: linear-gradient(180deg, var(--sz-slate), rgba(100, 116, 139, 0.3));
+  opacity: 0.45;
+}
+
+/* --------------------------- ERROR / EMPTY --------------------------- */
+.panelError::before {
+  background: linear-gradient(180deg, var(--sz-rose), rgba(217, 69, 95, 0.35));
+  opacity: 0.7;
+}
+
+.panelError::after {
+  background: radial-gradient(circle, rgba(217, 69, 95, 0.12), transparent 68%);
+}
+
+.errorBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px dashed var(--sz-border-strong);
+  border-radius: var(--sz-r-md);
+  background: var(--sz-surface-2);
+  z-index: 2;
+}
+
+[data-theme="dark"] .errorBody {
+  background: rgba(255, 255, 255, 0.022);
+}
+
+.panel .errorTitle {
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.855rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  color: var(--sz-ink);
+}
+
+.panel .errorText {
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.755rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--sz-ink-muted);
+}
+
+.panel .errorMeta {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--sz-ink-faint);
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------ NARROW ------------------------------ */
+@media (max-width: 480px) {
+  .panel {
+    padding: 0.95rem 0.95rem 0.9rem;
+    gap: 0.8rem;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(124px, 1fr));
+  }
+  .panel .title {
+    font-size: 0.98rem;
+  }
+  .panel .value {
+    font-size: 0.79rem;
+  }
+  .panel .commandBlock {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .panel .commandBlock {
+    font-size: 0.72rem;
+    padding: 0.6rem 0.7rem;
+  }
+  .header {
+    gap: 0.45rem 0.6rem;
+  }
+  .placeholderTitle {
+    width: 112px;
+  }
+}

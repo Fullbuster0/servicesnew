@@ -1,0 +1,476 @@
+/*
+ * ============================================================================
+ * CHAIN UPGRADE TABLE — v2 "Aurora Glass"
+ * Modern data table: frosted panel, tinted micro-caps header row, hairline
+ * row separators, mono tabular numerals for heights / block time / ETA,
+ * status pills, mobile horizontal scroll, tasteful empty state.
+ *
+ * Tokens (--sz-*) come from src/css/custom.css.
+ * Theming is done exclusively through [data-theme="dark"].
+ *
+ * NOTE ON SPECIFICITY: this table renders inside `.markdown` docs content,
+ * where custom.css defines `.markdown table` / `th` / `td` / `p` / `a`
+ * (specificity 0,1,1+). Every rule below is therefore scoped through
+ * `.panel ...` so it wins over those global doc defaults without !important.
+ * ============================================================================
+ */
+
+/* ------------------------------- PANEL ------------------------------- */
+.panel {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 1.15rem 0;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-lg);
+  background: var(--sz-surface);
+  box-shadow: var(--sz-sh-1);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Thin gradient cap along the top edge — static, no animation */
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--sz-grad-brand);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 2;
+}
+
+[data-theme="dark"] .panel {
+  background: linear-gradient(180deg, var(--sz-surface-2) 0%, var(--sz-surface) 100%);
+}
+
+/* --------------------------- SCROLL CONTAINER --------------------------- */
+/* Horizontal scroll on narrow viewports; the panel itself never overflows. */
+.panel .scroller {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.panel .scroller:focus-visible {
+  outline: none;
+  box-shadow: inset var(--sz-focus);
+}
+
+/* --------------------------------- TABLE --------------------------------- */
+.panel .table {
+  display: table;
+  width: 100%;
+  min-width: 900px; /* keeps columns legible; .scroller owns the overflow */
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  box-shadow: none;
+  table-layout: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visually hidden caption — keeps the table self-describing for AT */
+.panel .caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------ HEADER ROW ------------------------------ */
+.panel .headRow {
+  background: var(--sz-surface-2);
+}
+
+[data-theme="dark"] .panel .headRow {
+  background: var(--sz-surface-3);
+}
+
+.panel .head {
+  padding: 0.72rem 0.95rem;
+  border: 0;
+  border-bottom: 1px solid var(--sz-border);
+  background: transparent;
+  color: var(--sz-ink-faint);
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Index column — narrow, right aligned */
+.panel .headNum {
+  width: 1%;
+  padding-right: 0.7rem;
+  text-align: right;
+}
+
+/* --------------------------------- ROWS --------------------------------- */
+.panel .row {
+  background: transparent;
+  transition: background-color 140ms var(--sz-ease);
+}
+
+.panel .row:hover {
+  background: rgba(47, 95, 224, 0.045);
+}
+
+[data-theme="dark"] .panel .row:hover {
+  background: rgba(138, 169, 255, 0.055);
+}
+
+/* .cell is applied to both <td> and the <th scope="row"> network cell */
+.panel .cell {
+  padding: 0.68rem 0.95rem;
+  border: 0;
+  border-bottom: 1px solid var(--sz-hairline);
+  background: transparent;
+  color: var(--sz-ink-soft);
+  font-size: 0.855rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Last row: drop the trailing hairline, the panel border closes the table */
+.panel .row:last-child .cell {
+  border-bottom: 0;
+}
+
+/* Row index — mono, muted, right aligned */
+.panel .rowNum {
+  width: 1%;
+  padding-right: 0.7rem;
+  text-align: right;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--sz-ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------- CELL TYPOGRAPHY -------------------------- */
+/* Numeric / temporal data: mono with tabular figures so columns line up */
+.panel .mono {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--sz-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.panel .monoSoft {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--sz-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Countdown gets a touch more presence — the column operators scan first */
+.panel .countdown {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--sz-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Failed RPC values stay visible (operators need them) but read as faults.
+   Light ink is darkened past --sz-rose so it clears 4.5:1 on the row tint. */
+.panel .fault {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #bb2f47;
+}
+
+[data-theme="dark"] .panel .fault {
+  color: var(--sz-rose-ink);
+}
+
+/* Network name — row header link */
+.panel .rowHead {
+  font-weight: 700;
+}
+
+.panel .network {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--sz-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  text-decoration: none;
+  transition: color 160ms var(--sz-ease);
+}
+
+.panel .network:hover {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+/* Proposal id → mono chip link */
+.panel .proposal {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-xs);
+  background: var(--sz-surface-2);
+  color: var(--sz-ink-muted);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.73rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+  transition: color 160ms var(--sz-ease), border-color 160ms var(--sz-ease),
+    background-color 160ms var(--sz-ease);
+}
+
+.panel .proposal:hover {
+  color: var(--ifm-color-primary);
+  border-color: var(--sz-border-strong);
+  background: rgba(47, 95, 224, 0.08);
+  text-decoration: none;
+}
+
+[data-theme="dark"] .panel .proposal:hover {
+  background: rgba(138, 169, 255, 0.1);
+}
+
+/* Version → mono */
+.panel .version {
+  display: inline-block;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--sz-ink-soft);
+}
+
+/* Guide → compact outline pill button */
+.panel .guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 32px;
+  padding: 0.42rem 0.72rem;
+  border: 1px solid var(--sz-border-strong);
+  border-radius: var(--sz-r-pill);
+  color: var(--ifm-color-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 160ms var(--sz-ease), border-color 160ms var(--sz-ease),
+    background-color 160ms var(--sz-ease), transform 160ms var(--sz-ease);
+}
+
+.panel .guide:hover {
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  background: rgba(47, 95, 224, 0.08);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+[data-theme="dark"] .panel .guide:hover {
+  background: rgba(138, 169, 255, 0.1);
+}
+
+/* ------------------------------ STATUS PILLS ------------------------------ */
+.panel .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.16rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--sz-r-pill);
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.075em;
+  line-height: 1.55;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.panel .pillDot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Light-theme pill inks are hand-picked to clear 4.5:1 on their own tint. */
+.panel .pillScheduled {
+  color: #2f5fe0;
+  background: rgba(47, 95, 224, 0.1);
+  border-color: rgba(47, 95, 224, 0.24);
+}
+
+.panel .pillSoon {
+  color: #0a6274;
+  background: rgba(10, 165, 200, 0.11);
+  border-color: rgba(10, 165, 200, 0.26);
+}
+
+.panel .pillImminent {
+  color: #8a5a08;
+  background: rgba(200, 128, 26, 0.12);
+  border-color: rgba(200, 128, 26, 0.28);
+}
+
+.panel .pillDue {
+  color: #6a3ad0;
+  background: rgba(124, 77, 234, 0.1);
+  border-color: rgba(124, 77, 234, 0.26);
+}
+
+.panel .pillFault {
+  color: #bb2f47;
+  background: rgba(217, 69, 95, 0.1);
+  border-color: rgba(217, 69, 95, 0.26);
+}
+
+[data-theme="dark"] .panel .pillScheduled {
+  color: var(--sz-blue-ink);
+  background: rgba(138, 169, 255, 0.1);
+  border-color: rgba(138, 169, 255, 0.26);
+}
+
+[data-theme="dark"] .panel .pillSoon {
+  color: var(--sz-cyan-ink);
+  background: rgba(79, 216, 239, 0.1);
+  border-color: rgba(79, 216, 239, 0.26);
+}
+
+[data-theme="dark"] .panel .pillImminent {
+  color: var(--sz-amber-ink);
+  background: rgba(240, 179, 87, 0.1);
+  border-color: rgba(240, 179, 87, 0.26);
+}
+
+[data-theme="dark"] .panel .pillDue {
+  color: var(--sz-violet-ink);
+  background: rgba(178, 140, 255, 0.1);
+  border-color: rgba(178, 140, 255, 0.26);
+}
+
+[data-theme="dark"] .panel .pillFault {
+  color: var(--sz-rose-ink);
+  background: rgba(255, 125, 146, 0.1);
+  border-color: rgba(255, 125, 146, 0.26);
+}
+
+/* ------------------------------ EMPTY STATE ------------------------------ */
+.panel .empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2.35rem 1.35rem 2.5rem;
+  text-align: center;
+}
+
+.panel .emptyGlyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 0.35rem;
+  border: 1px solid var(--sz-border);
+  border-radius: 13px;
+  background: var(--sz-surface-2);
+  color: var(--sz-ink-faint);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.panel .emptyTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  color: var(--sz-ink);
+}
+
+.panel .emptyHint {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--sz-ink-muted);
+}
+
+.panel .emptyMeta {
+  margin-top: 0.55rem;
+  padding: 0.16rem 0.6rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-surface-2);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--sz-ink-faint);
+}
+
+/* ------------------------------ RESPONSIVE ------------------------------ */
+@media (max-width: 996px) {
+  .panel .head,
+  .panel .cell {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .panel {
+    margin: 1rem 0;
+    border-radius: var(--sz-r-md);
+  }
+  .panel .head {
+    font-size: 0.72rem;
+    letter-spacing: 0.09em;
+  }
+  .panel .cell {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    font-size: 0.82rem;
+  }
+  .panel .empty {
+    padding: 1.9rem 1rem 2rem;
+  }
+}

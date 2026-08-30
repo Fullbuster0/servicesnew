@@ -1,144 +1,133 @@
-/* Relayers page — hub sections & route grid.
- * Card language mirrors src/components/Card/Card.module.css (solid panels,
- * top accent bar, hover lift — no glass, no infinite animation). */
+/*
+ * Relayers page — v2 "Aurora Glass"
+ * Hub sections & route grid. Tokens (--sz-*) from src/css/custom.css.
+ */
 
 .hubSection {
-  margin-bottom: 2.75rem;
+  margin-bottom: 3rem;
 }
 
 .hubSection:last-child {
   margin-bottom: 0.5rem;
 }
 
-/* ---------- Hub header ---------- */
-
+/* ------------------------------ HUB HEADER ------------------------------ */
 .hubHeader {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.65rem 0.85rem;
-  margin-bottom: 1.1rem;
-  padding: 0 0.25rem;
+  margin-bottom: 1.2rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-md);
+  background: var(--sz-glass-strong);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--sz-sh-1);
 }
 
 .hubIcon {
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 2px;
+  object-fit: contain;
+  border: 1px solid var(--sz-border);
   border-radius: 10px;
-  object-fit: cover;
+  background: var(--sz-surface-2);
   flex-shrink: 0;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-[data-theme="dark"] .hubIcon {
-  border-color: rgba(148, 163, 184, 0.14);
 }
 
 .hubName {
   margin: 0;
-  font-size: 1.08rem;
+  font-size: 1.02rem;
   font-weight: 800;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
-  color: #0f172a;
-}
-
-[data-theme="dark"] .hubName {
-  color: #e8ecf4;
+  letter-spacing: -0.032em;
+  line-height: 1.25;
+  color: var(--sz-ink);
+  border: 0;
+  padding: 0;
 }
 
 .hubCount {
-  font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-  font-size: 0.62rem;
+  padding: 0.26rem 0.62rem;
+  border: 1px solid rgba(47, 95, 224, 0.24);
+  border-radius: var(--sz-r-pill);
+  background: rgba(47, 95, 224, 0.09);
+  color: var(--ifm-color-primary);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  padding: 0.28rem 0.6rem;
-  border-radius: 999px;
-  color: #005fcc;
-  background: rgba(0, 95, 204, 0.08);
-  border: 1px solid rgba(0, 95, 204, 0.2);
   white-space: nowrap;
 }
 
 [data-theme="dark"] .hubCount {
-  color: #8eb4e0;
-  background: rgba(74, 116, 168, 0.14);
-  border-color: rgba(122, 168, 224, 0.22);
+  background: rgba(138, 169, 255, 0.11);
+  border-color: rgba(138, 169, 255, 0.24);
 }
 
 .hubWallet {
   margin-left: auto;
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--sz-border-strong);
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-surface-2);
+  color: var(--sz-ink-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   text-decoration: none;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(100, 116, 139, 0.25);
-  transition:
-    color 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease;
+  transition: color 180ms var(--sz-ease), border-color 180ms var(--sz-ease),
+    background 180ms var(--sz-ease), transform 180ms var(--sz-ease);
 }
 
 .hubWallet:hover {
-  color: #005fcc;
-  border-color: rgba(0, 95, 204, 0.4);
-  background: rgba(0, 95, 204, 0.06);
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  background: rgba(47, 95, 224, 0.08);
+  transform: translateY(-1px);
   text-decoration: none;
 }
 
-[data-theme="dark"] .hubWallet {
-  color: rgba(148, 163, 184, 0.95);
-  border-color: rgba(148, 163, 184, 0.2);
-}
-
 [data-theme="dark"] .hubWallet:hover {
-  color: #8eb4e0;
-  border-color: rgba(122, 168, 224, 0.4);
-  background: rgba(74, 116, 168, 0.12);
+  background: rgba(138, 169, 255, 0.1);
 }
 
-/* ---------- Route grid ---------- */
-
+/* ------------------------------ ROUTE GRID ------------------------------ */
 .routeGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(318px, 1fr));
   gap: 1rem;
 }
 
-@media only screen and (max-width: 700px) {
-  .routeGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .hubWallet {
-    margin-left: 0;
-  }
-}
-
-/* ---------- Empty state (search) ---------- */
-
+/* ------------------------------ EMPTY STATE ------------------------------ */
 .emptyState {
   text-align: center;
-  padding: 3.5rem 1rem;
-  color: #64748b;
+  padding: 3.75rem 1.25rem;
+  border: 1px dashed var(--sz-border-strong);
+  border-radius: var(--sz-r-lg);
+  background: var(--sz-surface-2);
+  color: var(--sz-ink-muted);
   font-size: 0.95rem;
-  border: 1px dashed rgba(100, 116, 139, 0.3);
-  border-radius: 16px;
-}
-
-[data-theme="dark"] .emptyState {
-  color: rgba(148, 163, 184, 0.9);
-  border-color: rgba(148, 163, 184, 0.2);
 }
 
 .emptyState strong {
-  color: #0f172a;
+  color: var(--sz-ink);
 }
 
-[data-theme="dark"] .emptyState strong {
-  color: #e8ecf4;
+@media (max-width: 700px) {
+  .routeGrid {
+    grid-template-columns: 1fr;
+  }
+  .hubWallet {
+    margin-left: 0;
+  }
+  .hubHeader {
+    padding: 0.7rem 0.8rem;
+  }
 }

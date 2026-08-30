@@ -1,0 +1,736 @@
+/**
+ * ============================================================================
+ * SHAZOES · DOCS SURFACE — additive layer for the markdown doc pages
+ * ----------------------------------------------------------------------------
+ * Companion sheet to custom.css (design system v2 "Aurora Glass").
+ *
+ * Purely additive: it defines NEW global `dx-*` classes consumed from
+ * JSX-in-MDX (markdown pages cannot import CSS modules) and never redefines
+ * an existing global doc class (.mainnets-hero, .services-grid, .service-card,
+ * .archived-notice-banner, .endpoints*, .sub-lines, .h1-with-icon, …).
+ *
+ * SPECIFICITY NOTE — this file is @imported at the TOP of custom.css, so
+ * custom.css's `.markdown h1 / h2 / p / li` rules and Infima/Bootstrap list
+ * resets cascade AFTER it. Anything that would lose a specificity tie is
+ * therefore re-stated in section 11 with a `.markdown` prefix.
+ *
+ * Rules honoured:
+ *   · consumes only existing --sz-* / --ifm-* tokens
+ *   · zero infinite animation, zero blur() on animated layers
+ *   · no `transition: all` — every transition enumerates its properties
+ *   · dark mode exclusively via [data-theme="dark"]
+ * ============================================================================
+ */
+
+/* ============================== 0 · LOCAL SCALE ============================== */
+:root {
+  --dx-gap: 14px;
+  --dx-tile-min: 158px;
+  --dx-rhythm: 2.75rem;
+}
+
+/* ============================== 1 · HERO ============================== */
+.dx-hero {
+  position: relative;
+  isolation: isolate;
+  margin: 0.25rem 0 var(--dx-rhythm);
+  padding: 1.85rem 1.95rem 1.7rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-lg);
+  background:
+    radial-gradient(ellipse 62% 120% at 100% 0%, rgba(124, 77, 234, 0.11), transparent 62%),
+    radial-gradient(ellipse 58% 130% at 0% 100%, rgba(47, 95, 224, 0.09), transparent 60%),
+    var(--sz-surface);
+  box-shadow: var(--sz-sh-2);
+  overflow: hidden;
+}
+
+/* Static gradient rail — decorative, never animated. */
+.dx-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--sz-grad-brand);
+  opacity: 0.9;
+}
+
+/* Static blueprint grid wash behind the content. */
+.dx-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, var(--sz-hairline) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--sz-hairline) 1px, transparent 1px);
+  background-size: 44px 44px, 44px 44px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .dx-hero {
+  background:
+    radial-gradient(ellipse 62% 120% at 100% 0%, rgba(178, 140, 255, 0.13), transparent 62%),
+    radial-gradient(ellipse 58% 130% at 0% 100%, rgba(138, 169, 255, 0.1), transparent 60%),
+    var(--sz-surface);
+}
+
+.dx-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.72rem;
+  border: 1px solid var(--sz-border-strong);
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-surface-2);
+  color: var(--sz-ink-muted);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dx-hero__eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-emerald);
+  box-shadow: 0 0 0 3px rgba(15, 159, 120, 0.18);
+}
+
+/* The hero title is authored as a real markdown `#` heading so Docusaurus
+   still resolves `contentTitle` (no duplicate synthetic <h1>) and the anchor
+   link keeps working. The theme wraps that heading in a <header>. */
+.dx-hero > header {
+  margin: 0;
+}
+
+.dx-hero__lede {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--sz-ink-muted);
+  font-size: 1.03rem;
+  line-height: 1.75;
+}
+
+.dx-hero__lede strong {
+  color: var(--sz-ink);
+  font-weight: 700;
+}
+
+/* Compact stat strip inside the hero. */
+.dx-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 2.1rem;
+  margin: 1.5rem 0 0;
+  padding: 1.15rem 0 0;
+  border-top: 1px solid var(--sz-hairline);
+  list-style: none;
+}
+
+.dx-hero__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+}
+
+.dx-hero__stat-value {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--sz-ink);
+}
+
+.dx-hero__stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: var(--sz-ink-faint);
+}
+
+.dx-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+/* ============================== 2 · BUTTONS ============================== */
+.dx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.05rem;
+  border: 1px solid transparent;
+  border-radius: var(--sz-r-pill);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none !important;
+  transition: transform 200ms var(--sz-ease), box-shadow 200ms var(--sz-ease),
+    border-color 200ms var(--sz-ease), background-color 200ms var(--sz-ease);
+}
+
+.dx-btn:hover {
+  transform: translateY(-2px);
+}
+
+.dx-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--sz-focus);
+}
+
+.dx-btn--primary {
+  background: var(--sz-grad-cta);
+  color: #fff !important;
+  box-shadow: var(--sz-sh-glow);
+}
+
+.dx-btn--ghost {
+  border-color: var(--sz-border-strong);
+  background: var(--sz-surface);
+  color: var(--sz-ink) !important;
+  box-shadow: var(--sz-sh-1);
+}
+
+.dx-btn--ghost:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: var(--sz-sh-2);
+}
+
+[data-theme="dark"] .dx-btn--ghost {
+  background: var(--sz-surface-2);
+}
+
+/* ============================== 3 · SECTIONS & RHYTHM ============================== */
+.dx-section {
+  margin: var(--dx-rhythm) 0;
+}
+
+.dx-section__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.85rem;
+  margin-bottom: 1.15rem;
+}
+
+.dx-section__hint {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--sz-ink-faint);
+}
+
+.dx-lede {
+  max-width: 70ch;
+  color: var(--sz-ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.8;
+}
+
+/* Gradient hairline used instead of a bare `---` separator. */
+.dx-rule {
+  height: 1px;
+  border: 0;
+  background: var(--sz-grad-line);
+}
+
+/* ============================== 4 · SERVICE TILE GRID ============================== */
+.dx-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--dx-tile-min), 1fr));
+  gap: var(--dx-gap);
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dx-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.15rem 1.05rem 1.2rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-md);
+  background: var(--sz-surface);
+  box-shadow: var(--sz-sh-1);
+  overflow: hidden;
+  transition: transform 220ms var(--sz-ease), border-color 220ms var(--sz-ease),
+    box-shadow 220ms var(--sz-ease);
+}
+
+.dx-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--dx-tile-accent, var(--sz-grad-brand));
+  opacity: 0;
+  transition: opacity 220ms var(--sz-ease);
+}
+
+.dx-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--sz-border-strong);
+  box-shadow: var(--sz-sh-3);
+}
+
+.dx-tile:hover::before {
+  opacity: 1;
+}
+
+[data-theme="dark"] .dx-tile {
+  background: var(--sz-surface-2);
+}
+
+.dx-tile__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--sz-hairline);
+  border-radius: var(--sz-r-sm);
+  background: var(--sz-surface-2);
+  font-size: 1.18rem;
+  line-height: 1;
+}
+
+[data-theme="dark"] .dx-tile__icon {
+  background: var(--sz-surface-3);
+}
+
+.dx-tile__name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  line-height: 1.35;
+  color: var(--sz-ink);
+}
+
+.dx-tile__desc {
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--sz-ink-faint);
+}
+
+/* Accent variants — recolour the hover rail only, never the text. */
+.dx-tile--blue {
+  --dx-tile-accent: linear-gradient(90deg, var(--sz-blue), var(--sz-cyan));
+}
+.dx-tile--violet {
+  --dx-tile-accent: linear-gradient(90deg, var(--sz-violet), var(--sz-blue));
+}
+.dx-tile--cyan {
+  --dx-tile-accent: linear-gradient(90deg, var(--sz-cyan), var(--sz-emerald));
+}
+.dx-tile--emerald {
+  --dx-tile-accent: linear-gradient(90deg, var(--sz-emerald), var(--sz-cyan));
+}
+.dx-tile--amber {
+  --dx-tile-accent: linear-gradient(90deg, var(--sz-amber), var(--sz-rose));
+}
+.dx-tile--rose {
+  --dx-tile-accent: linear-gradient(90deg, var(--sz-rose), var(--sz-violet));
+}
+
+/* ============================== 5 · NAV / LINK CARDS ============================== */
+.dx-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+  gap: var(--dx-gap);
+  margin: 1.1rem 0 0;
+}
+
+.dx-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1.3rem 1.35rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-lg);
+  background: var(--sz-surface);
+  box-shadow: var(--sz-sh-1);
+  color: inherit !important;
+  text-decoration: none !important;
+  transition: transform 220ms var(--sz-ease), border-color 220ms var(--sz-ease),
+    box-shadow 220ms var(--sz-ease);
+}
+
+.dx-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ifm-color-primary);
+  box-shadow: var(--sz-sh-3);
+}
+
+.dx-card:focus-visible {
+  outline: none;
+  box-shadow: var(--sz-focus);
+}
+
+[data-theme="dark"] .dx-card {
+  background: var(--sz-surface-2);
+}
+
+.dx-card__kicker {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ifm-color-primary);
+}
+
+.dx-card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.06rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.3;
+  color: var(--sz-ink);
+}
+
+.dx-card__desc {
+  font-size: 0.87rem;
+  line-height: 1.62;
+  color: var(--sz-ink-muted);
+}
+
+.dx-card__arrow {
+  margin-left: auto;
+  color: var(--sz-ink-faint);
+  transition: transform 220ms var(--sz-ease), color 220ms var(--sz-ease);
+}
+
+.dx-card:hover .dx-card__arrow {
+  transform: translateX(3px);
+  color: var(--ifm-color-primary);
+}
+
+/* ============================== 6 · CHIPS & META ROW ============================== */
+.dx-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-surface-2);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--sz-ink-soft);
+}
+
+.dx-chip__key {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sz-ink-faint);
+}
+
+.dx-chip__val {
+  color: var(--sz-ink);
+}
+
+.dx-chip--live .dx-chip__val {
+  color: var(--sz-emerald-ink);
+}
+
+.dx-chip--test .dx-chip__val {
+  color: var(--sz-amber-ink);
+}
+
+/* ============================== 7 · CALLOUT ============================== */
+.dx-callout {
+  display: flex;
+  gap: 0.85rem;
+  margin: 1.6rem 0;
+  padding: 1.05rem 1.2rem;
+  border: 1px solid var(--sz-border);
+  border-left: 3px solid var(--ifm-color-primary);
+  border-radius: var(--sz-r-md);
+  background: var(--sz-surface-2);
+  color: var(--sz-ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.dx-callout__icon {
+  flex: 0 0 auto;
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+.dx-callout__title {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sz-ink);
+}
+
+.dx-callout--warn {
+  border-left-color: var(--sz-amber);
+}
+
+.dx-callout--ok {
+  border-left-color: var(--sz-emerald);
+}
+
+/* ============================== 8 · PANEL (data widgets) ============================== */
+.dx-panel {
+  margin: 1.2rem 0 0;
+  padding: 0.5rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-lg);
+  background: var(--sz-surface);
+  box-shadow: var(--sz-sh-1);
+  overflow-x: auto;
+}
+
+[data-theme="dark"] .dx-panel {
+  background: var(--sz-surface-2);
+}
+
+/* ============================== 9 · STEP LIST ============================== */
+.dx-steps {
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: dx-step;
+}
+
+.dx-step {
+  position: relative;
+  margin-left: 0.86rem;
+  padding: 0 0 1.25rem 2.55rem;
+  border-left: 1px solid var(--sz-border);
+}
+
+.dx-step:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent;
+}
+
+.dx-step::before {
+  counter-increment: dx-step;
+  content: counter(dx-step);
+  position: absolute;
+  left: -0.86rem;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.72rem;
+  height: 1.72rem;
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-grad-brand);
+  color: #fff;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.dx-step__title {
+  display: block;
+  margin: 0.16rem 0 0.3rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--sz-ink);
+}
+
+.dx-step__body {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--sz-ink-muted);
+}
+
+/* ============================== 10 · SIMPLE PAGE (src/pages/*.md) ============================== */
+.dx-page {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* ============================================================================
+ * 11 · CASCADE OVERRIDES
+ * This sheet is imported ABOVE custom.css, so the generic `.markdown h1/h2/p/li`
+ * rules there (and the Infima/Bootstrap list resets) would otherwise win
+ * specificity ties. Re-stated here with a `.markdown` prefix to raise
+ * specificity without touching custom.css.
+ * ========================================================================= */
+
+/* --- hero title (markdown `#`, wrapped in <header> by the theme) --- */
+.markdown .dx-hero h1 {
+  margin: 0.95rem 0 0.7rem;
+  padding: 0;
+  border: 0;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.06;
+  background: var(--sz-grad-cta);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* --- section heading (markdown `##`, keeps its anchor + TOC entry) --- */
+.markdown .dx-section__head h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 1.36rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+  color: var(--sz-ink);
+}
+
+/* Hash-link must not inherit the transparent text fill of the gradient title. */
+.markdown .dx-hero h1 .hash-link,
+.markdown .dx-section__head h2 .hash-link {
+  -webkit-text-fill-color: currentColor;
+  color: var(--ifm-color-primary);
+}
+
+/* --- paragraphs --- */
+.markdown p.dx-hero__lede,
+.markdown .dx-hero__lede p {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--sz-ink-muted);
+  font-size: 1.03rem;
+  line-height: 1.75;
+}
+
+.markdown p.dx-lede,
+.markdown .dx-lede p {
+  max-width: 70ch;
+  margin: 0 0 1.4rem;
+  color: var(--sz-ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.8;
+}
+
+.markdown .dx-callout__body p,
+.markdown .dx-card__desc p,
+.markdown .dx-tile__desc p,
+.markdown .dx-step__body p {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+/* --- separator --- */
+.markdown hr.dx-rule {
+  height: 1px;
+  margin: var(--dx-rhythm) 0;
+  border: 0;
+  background: var(--sz-grad-line);
+}
+
+/* --- list items (beat `.markdown li` + Infima `li + li`) --- */
+.markdown .dx-tiles .dx-tile,
+.markdown .dx-hero__stats .dx-hero__stat,
+.markdown .dx-meta .dx-chip,
+.markdown .dx-steps .dx-step {
+  margin-top: 0;
+  color: var(--sz-ink-soft);
+}
+
+.markdown .dx-tiles .dx-tile {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.markdown .dx-meta .dx-chip {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--sz-ink-soft);
+}
+
+.markdown .dx-steps .dx-step {
+  margin-left: 0.86rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.markdown .dx-hero__stats,
+.markdown .dx-meta,
+.markdown .dx-tiles,
+.markdown .dx-steps {
+  padding-left: 0;
+  list-style: none;
+}
+
+/* ============================== 12 · RESPONSIVE ============================== */
+@media (max-width: 996px) {
+  :root {
+    --dx-rhythm: 2.25rem;
+  }
+  .dx-hero {
+    padding: 1.55rem 1.4rem 1.35rem;
+  }
+}
+
+@media (max-width: 576px) {
+  :root {
+    --dx-gap: 10px;
+    --dx-tile-min: 132px;
+  }
+  .dx-hero {
+    padding: 1.35rem 1.15rem 1.2rem;
+  }
+  .dx-hero__stats {
+    gap: 0.9rem 1.4rem;
+  }
+  .dx-hero__actions .dx-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .dx-tile {
+    padding: 0.95rem 0.85rem 1rem;
+  }
+  .dx-tile__desc {
+    display: none;
+  }
+  .dx-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dx-btn:hover,
+  .dx-tile:hover,
+  .dx-card:hover,
+  .dx-card:hover .dx-card__arrow {
+    transform: none;
+  }
+}

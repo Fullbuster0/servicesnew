@@ -36,15 +36,30 @@ function HomepageHeader() {
             Validator · Infrastructure · Public Services
           </div>
           <h1 className={styles.heroTitle}>
-            Trusted Blockchain Validator &amp; Services Provider
+            Trusted blockchain{" "}
+            <span className={styles.heroTitleAccent}>validator</span> &amp;
+            services provider
           </h1>
           <p className={styles.heroTagline}>
-            Shazoes is a validator that prioritizes stability, security, and
-            maximum performance when supporting blockchain networks. With
-            dependable infrastructure, we ensure that our nodes are constantly
-            operational and provide public services to benefit the blockchain
+            Shazoes runs validator and public infrastructure for the Cosmos
+            ecosystem — tuned for stability, security and uptime. Nodes,
+            relayers, explorers and faucets, operated 24/7 and free for the
             community.
           </p>
+          <div className={styles.heroActions}>
+            <a className={styles.heroCta} href="#networks">
+              Explore networks
+            </a>
+            <a
+              className={styles.heroGhost}
+              href="https://explorer.shazoes.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open explorer ↗
+            </a>
+          </div>
+
           <div className={styles.statsRow}>
             <div className={styles.statGlass} data-hue="blue">
               <span className={styles.statLabel}>Mainnet Chains</span>
@@ -112,7 +127,7 @@ function HomepageMain() {
       : `Archive · ${archiveItems.length}`;
 
   return (
-    <div className={styles.mainSection}>
+    <div className={styles.mainSection} id="networks">
       <div className="container">
         <div className={styles.sectionHead}>
           <div>

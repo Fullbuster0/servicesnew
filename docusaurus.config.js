@@ -76,8 +76,16 @@ const config = {
     },
 
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      // Measured WCAG sweep over all 20 bundled themes (script /tmp/themecontrast.js):
+      //   github      -> 23 of 30 token colours fail 4.5:1 (worst #36acaa = 2.58:1)
+      //   dracula     -> comment 3.03:1, and its plain #F8F8F2 leaked into our
+      //                  darker surface leaving operators/punctuation at 1.48:1
+      //   vsLight     -> 1 of 18 fail (worst 4.00:1; patched in custom.css)
+      //   oceanicNext -> 0 of 31 fail (worst 4.68:1)
+      // prism-react-renderer writes per-token INLINE style="color:#..", so CSS
+      // can only override it with !important — see custom.css §PRISM TOKEN CONTRAST.
+      theme: prismThemes.vsLight,
+      darkTheme: prismThemes.oceanicNext,
     },
   },
 };

@@ -1,0 +1,165 @@
+/*
+ * ============================================================================
+ * UPGRADE REMAINING BLOCK — v2 "Aurora Glass"
+ * Compact inline mono chip: remaining block count + status text.
+ * Sits inside running prose (docs <span>), so it must stay inline-flex,
+ * baseline-friendly and never introduce layout shift while polling.
+ *
+ * Tokens (--sz-*) come from src/css/custom.css.
+ * Theming is done exclusively through [data-theme="dark"].
+ * ============================================================================
+ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  vertical-align: middle;
+  max-width: 100%;
+  padding: 0.2rem 0.6rem 0.2rem 0.5rem;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--sz-r-pill);
+  background: var(--sz-surface-2);
+  box-shadow: var(--sz-sh-1);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .chip {
+  background: var(--sz-surface-3);
+}
+
+/* Leading dot conveys state at a glance (colour set per-variant). */
+.dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* The number itself — the value operators actually read. */
+.count {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--sz-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sz-ink-faint);
+}
+
+/* Hairline divider between the count and the status text. */
+.sep {
+  width: 1px;
+  height: 12px;
+  flex-shrink: 0;
+  background: var(--sz-border-strong);
+}
+
+.status {
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: normal;
+}
+
+/* ------------------------------- VARIANTS ------------------------------- */
+/* Pending — do not upgrade yet. Light-theme inks are picked for 4.5:1 on tint. */
+.chipPending {
+  color: #2f5fe0;
+  border-color: rgba(47, 95, 224, 0.26);
+  background: rgba(47, 95, 224, 0.08);
+}
+
+.chipPending .status {
+  color: #2a4fa8;
+}
+
+[data-theme="dark"] .chipPending {
+  color: var(--sz-blue-ink);
+  border-color: rgba(138, 169, 255, 0.26);
+  background: rgba(138, 169, 255, 0.1);
+}
+
+[data-theme="dark"] .chipPending .status {
+  color: var(--sz-ink-soft);
+}
+
+/* Reached — upgrade window is open. */
+.chipReached {
+  color: #0a7d5f;
+  border-color: rgba(15, 159, 120, 0.3);
+  background: rgba(15, 159, 120, 0.09);
+}
+
+.chipReached .status {
+  color: #0a6b52;
+}
+
+[data-theme="dark"] .chipReached {
+  color: var(--sz-emerald-ink);
+  border-color: rgba(71, 214, 165, 0.28);
+  background: rgba(71, 214, 165, 0.1);
+}
+
+[data-theme="dark"] .chipReached .status {
+  color: var(--sz-ink-soft);
+}
+
+/* Loading — neutral, no animation (site had a flicker regression). */
+.chipLoading {
+  color: var(--sz-slate-ink);
+  border-color: var(--sz-border);
+  background: var(--sz-surface-2);
+}
+
+.chipLoading .status {
+  color: var(--sz-ink-muted);
+}
+
+[data-theme="dark"] .chipLoading {
+  background: var(--sz-surface-3);
+}
+
+/* Error — RPC unreachable. */
+.chipError {
+  color: #bb2f47;
+  border-color: rgba(217, 69, 95, 0.3);
+  background: rgba(217, 69, 95, 0.09);
+}
+
+.chipError .status {
+  color: #a72a40;
+}
+
+[data-theme="dark"] .chipError {
+  color: var(--sz-rose-ink);
+  border-color: rgba(255, 125, 146, 0.28);
+  background: rgba(255, 125, 146, 0.1);
+}
+
+[data-theme="dark"] .chipError .status {
+  color: var(--sz-ink-soft);
+}
+
+/* ------------------------------ RESPONSIVE ------------------------------ */
+@media (max-width: 576px) {
+  .chip {
+    gap: 0.4rem;
+    padding: 0.18rem 0.5rem 0.18rem 0.45rem;
+    font-size: 0.73rem;
+  }
+  .status {
+    font-size: 0.72rem;
+  }
+}

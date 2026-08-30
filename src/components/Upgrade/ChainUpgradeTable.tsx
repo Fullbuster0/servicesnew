@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import DOMPurify from "dompurify";
 import Link from "@docusaurus/Link";
+import styles from "./ChainUpgradeTable.module.css";
+
+/** Strip any markup out of remote JSON values before rendering. */
+function clean(value: any): string {
+  return DOMPurify.sanitize(String(value ?? ""), {
+    ALLOWED_TAGS: [],
+    ALLOWED_ATTR: [],
+  });
+}
 
 /**
  * Fetch a Tendermint RPC path, trying multiple endpoints in order.
@@ -70,6 +79,40 @@ async function getAverageBlockTime(
   } catch {
     return 6.5;
   }
+}
+
+type UpgradeStatus = {
+  label: string;
+  className: string;
+};
+
+/**
+ * Purely presentational: derive the status pill from values that are already
+ * on the row. Rows whose RPCs all failed are surfaced as a FAULT pill so a
+ * broken endpoint is never silently hidden from operators.
+ */
+function getStatus(chain: any): UpgradeStatus {
+  if (
+    chain.latestHeight === "Error" ||
+    typeof chain.latestHeight !== "number" ||
+    typeof chain.avgBlockTime !== "number"
+  ) {
+    return { label: "RPC Fault", className: styles.pillFault };
+  }
+
+  const remainingBlocks = Number(chain.target_height) - chain.latestHeight;
+  if (!Number.isFinite(remainingBlocks) || remainingBlocks <= 0) {
+    return { label: "Due Now", className: styles.pillDue };
+  }
+
+  const secondsLeft = remainingBlocks * chain.avgBlockTime;
+  if (secondsLeft <= 3600) {
+    return { label: "Imminent", className: styles.pillImminent };
+  }
+  if (secondsLeft <= 86400) {
+    return { label: "Soon", className: styles.pillSoon };
+  }
+  return { label: "Scheduled", className: styles.pillScheduled };
 }
 
 export default function ChainUpgradeTable({
@@ -191,83 +234,152 @@ export default function ChainUpgradeTable({
   // Render nothing until first load completes.
   if (!loaded) return null;
 
-  // Render nothing when there are no upcoming upgrades — no fallback text.
-  if (data.length === 0) return null;
+  // No upcoming upgrades — quiet, self-explanatory panel instead of a bare gap.
+  if (data.length === 0) {
+    return (
+      <div className={styles.panel}>
+        <div className={styles.empty}>
+          <span className={styles.emptyGlyph} aria-hidden="true">
+            ✓
+          </span>
+          <p className={styles.emptyTitle}>No upgrades scheduled</p>
+          <p className={styles.emptyHint}>
+            Every tracked {chainType === "testnet" ? "testnet" : "mainnet"} is
+            running its current release. New upgrade proposals appear here as
+            soon as they pass.
+          </p>
+          <span className={styles.emptyMeta}>refresh · 30s</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-x-auto mt-4">
-      <table className="w-full table-auto text-sm text-left border border-gray-300 dark:border-gray-700">
-        <thead className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
-          <tr>
-            <th className="px-4 py-2 border-b">#</th>
-            <th className="px-4 py-2 border-b">Network</th>
-            <th className="px-4 py-2 border-b">Proposal ID</th>
-            <th className="px-4 py-2 border-b">Block</th>
-            <th className="px-4 py-2 border-b">Avg Block Time</th>
-            <th className="px-4 py-2 border-b">Estimate Upgrade</th>
-            <th className="px-4 py-2 border-b">Your Local Time</th>
-            <th className="px-4 py-2 border-b">Version</th>
-            <th className="px-4 py-2 border-b">Guide</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-900 dark:text-gray-100">
-          {data.map((chain, idx) => (
-            <tr
-              key={idx}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <td className="px-4 py-2">{idx + 1}</td>
-              <td className="px-4 py-2">
-                <Link href={chain.link}>
-                  {DOMPurify.sanitize(chain.network, {
-                    ALLOWED_TAGS: [],
-                    ALLOWED_ATTR: [],
-                  })}
-                </Link>
-              </td>
-              <td className="px-4 py-2">
-                <Link href={chain.proposal}>
-                  #
-                  {DOMPurify.sanitize(chain.proposal_id, {
-                    ALLOWED_TAGS: [],
-                    ALLOWED_ATTR: [],
-                  })}
-                </Link>
-              </td>
-              <td className="px-4 py-2">{chain.target_height}</td>
-              <td className="px-4 py-2">
-                {typeof chain.avgBlockTime === "number"
-                  ? `${chain.avgBlockTime.toFixed(1)}s`
-                  : DOMPurify.sanitize(String(chain.avgBlockTime), {
-                      ALLOWED_TAGS: [],
-                      ALLOWED_ATTR: [],
-                    })}
-              </td>
-              <td className="px-4 py-2">
-                {DOMPurify.sanitize(chain.timeLeft, {
-                  ALLOWED_TAGS: [],
-                  ALLOWED_ATTR: [],
-                })}
-              </td>
-              <td className="px-4 py-2">
-                {DOMPurify.sanitize(chain.eta, {
-                  ALLOWED_TAGS: [],
-                  ALLOWED_ATTR: [],
-                })}
-              </td>
-              <td className="px-4 py-2">
-                {DOMPurify.sanitize(chain.version, {
-                  ALLOWED_TAGS: [],
-                  ALLOWED_ATTR: [],
-                })}
-              </td>
-              <td className="px-4 py-2">
-                <Link href={`${chain.link}upgrade`}>Guide</Link>
-              </td>
+    <div className={styles.panel}>
+      {/* Keyboard-scrollable region needs a name so AT can announce it */}
+      <div
+        className={styles.scroller}
+        tabIndex={0}
+        role="region"
+        aria-label={`${
+          chainType === "testnet" ? "Testnet" : "Mainnet"
+        } upgrade schedule (scrollable)`}
+      >
+        <table className={styles.table}>
+          <caption className={styles.caption}>
+            Upcoming {chainType === "testnet" ? "testnet" : "mainnet"} chain
+            upgrades with estimated activation times. Refreshes every 30
+            seconds.
+          </caption>
+          <thead>
+            <tr className={styles.headRow}>
+              <th scope="col" className={`${styles.head} ${styles.headNum}`}>
+                #
+              </th>
+              <th scope="col" className={styles.head}>
+                Network
+              </th>
+              <th scope="col" className={styles.head}>
+                Proposal
+              </th>
+              <th scope="col" className={styles.head}>
+                Block
+              </th>
+              <th scope="col" className={styles.head}>
+                Avg Block Time
+              </th>
+              <th scope="col" className={styles.head}>
+                Estimate Upgrade
+              </th>
+              <th scope="col" className={styles.head}>
+                Your Local Time
+              </th>
+              <th scope="col" className={styles.head}>
+                Version
+              </th>
+              <th scope="col" className={styles.head}>
+                Status
+              </th>
+              <th scope="col" className={styles.head}>
+                Guide
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((chain, idx) => {
+              const status = getStatus(chain);
+              const isFault = chain.avgBlockTime === "Error";
+              return (
+                <tr key={idx} className={styles.row}>
+                  <td className={`${styles.cell} ${styles.rowNum}`}>
+                    {idx + 1}
+                  </td>
+                  <th
+                    scope="row"
+                    className={`${styles.cell} ${styles.rowHead}`}
+                  >
+                    <Link href={chain.link} className={styles.network}>
+                      {clean(chain.network)}
+                    </Link>
+                  </th>
+                  <td className={styles.cell}>
+                    <Link href={chain.proposal} className={styles.proposal}>
+                      #{clean(chain.proposal_id)}
+                    </Link>
+                  </td>
+                  <td className={`${styles.cell} ${styles.mono}`}>
+                    {clean(chain.target_height)}
+                  </td>
+                  <td className={`${styles.cell} ${styles.monoSoft}`}>
+                    {typeof chain.avgBlockTime === "number" ? (
+                      `${chain.avgBlockTime.toFixed(1)}s`
+                    ) : (
+                      <span className={styles.fault}>
+                        {clean(chain.avgBlockTime)}
+                      </span>
+                    )}
+                  </td>
+                  <td className={`${styles.cell} ${styles.countdown}`}>
+                    {isFault ? (
+                      <span className={styles.fault}>
+                        {clean(chain.timeLeft)}
+                      </span>
+                    ) : (
+                      clean(chain.timeLeft)
+                    )}
+                  </td>
+                  <td className={`${styles.cell} ${styles.monoSoft}`}>
+                    {isFault ? (
+                      <span className={styles.fault}>{clean(chain.eta)}</span>
+                    ) : (
+                      clean(chain.eta)
+                    )}
+                  </td>
+                  <td className={styles.cell}>
+                    <span className={styles.version}>
+                      {clean(chain.version)}
+                    </span>
+                  </td>
+                  <td className={styles.cell}>
+                    <span className={`${styles.pill} ${status.className}`}>
+                      <span className={styles.pillDot} aria-hidden="true" />
+                      {status.label}
+                    </span>
+                  </td>
+                  <td className={styles.cell}>
+                    <Link
+                      href={`${chain.link}upgrade`}
+                      className={styles.guide}
+                    >
+                      Guide
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
